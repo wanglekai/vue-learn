@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vue-base</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    .task-item {
+      max-width: 600px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .pointer {
+      cursor: pointer;
+    }
+    .btn {
+      color: #fff;
+      padding: 4px 12px;
+      outline: none;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+    .primary {
+      background-color: #048eff;
+    }
+    .danger {
+      background-color: #ff0000;
+    }
+  </style>
+</head>
+<body>
+  
+  <div id="vm">
+    <h1>{{ message }}</h1>
+    
+    <h2>{{date}}</h2>
+
+    <h3>写一个 TodoList 吧</h3>
+    <div>
+      <div>
+        <input type="text" placeholder="输入内容" v-model.trim="inputContent" />
+        <button v-on:click="addTask">添加</button>
+      </div>
+      <ul>
+        <li class="task-item" v-for="(item, index) in todos">
+          <label class="pointer">
+            <!-- <input type="checkbox" :checked="item.done" /> -->
+            <input type="checkbox" v-model="item.done" />
+            <span>{{item.text}}</span>
+          </label>
+          <div class="el-btns">
+            <button v-on:click="handleEidtBtn(index)" class="btn primary">Edit</button>
+            <button v-on:click="handleDeleteBtn(index)" class="btn danger" class="pointer">Delete</button>
+          </div>
+        </li>
+      </ul>
+      <div></div>
+        <p>
+          当前已完成的任务: <span v-for="item in finished">{{item.text}} ; </span>
+        </p>
+        <p>
+          当前未完成的任务: <span v-for="item in unfinished">{{item.text}} ; </span>
+        </p>
+      </div>
+    </div>
+    
+  </div>
+
+
+  <script>
+    const vm = new Vue({
+      el: "#vm",
+      data: {
+        message: 'Hello Vue',
+        date: '页面加载于 ' + new Date().toLocaleString(),
+        todos: [
+          { text: '学习 JavaScript', done: true },
+          { text: '学习 Vue', done: false },
+          { text: '整个牛项目', done: false }
+        ],
+        inputContent: ''
+      },
+      computed: {
+        finished () {
+          return this.filterTodos(true)
+        },
+        unfinished () {
+          return this.filterTodos(false)
+        }
+      },
+      methods: {
+        // 添加 任务内容
+        addTask() {
+          if (this.inputContent.trim()) {
+            let isN = this.todos.some(item => item.text.trim() === this.inputContent.trim())
+            if (isN) {
+              this.inputContent = ''
+              return alert('输入的当前内容列表已存在')
+            }
+            this.todos.unshift({ text: this.inputContent, done: false })
+          } else {
+            alert('内容不能为空')
+          }
+          this.inputContent = ''
+        },
+        // 删除指定项
+        handleDeleteBtn(index) {
+          let isConf = confirm('确定是否删除')
+          isConf && this.todos.splice(index, 1)
+        },
+        // 修改指定项
+        handleEidtBtn(index) {
+          let content = prompt('修改的内容', this.todos[index].text)
+          if (content==null) return
+          this.todos[index].text = content 
+        },
+        filterTodos(boolean) {
+          return this.todos.filter(item => item.done === boolean)
+        }
+      }
+    })
+  </script>
+</body>
+</html>
